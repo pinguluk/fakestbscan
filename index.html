@@ -135,105 +135,78 @@
             scan: new Audio('sounds/scan-1.mp3'),
             success: new Audio('sounds/success-1.mp3'),
             error: new Audio('sounds/error-1.mp3'),
-        }
+        };
 
-        // let currentFakeScanResult = "error";
-
-        // Set the hold duration in milliseconds (e.g., 3000 ms = 3 seconds)
         const holdDuration = 500;
-        let holdTimeout;
+        let holdTimeout, displayDefaultTextTimeout;
 
         const textContainer = document.getElementById("text-container");
         const text = document.querySelector("h1");
         const overlayElements = document.querySelectorAll(".overlay-element");
 
-        // Function to handle hold detection
+        let canScan = true;
+
         function startHoldDetection(element) {
-            holdTimeout = setTimeout(() => {
-                displayScanningResult();
-                setTimeout(() => {
-                    displayScanResult(element);
-                }, 1000);
-                // Add any action here when hold duration is met
-            }, holdDuration);
+            if (canScan) {
+                holdTimeout = setTimeout(() => {
+                    displayScanning();
+                    setTimeout(() => displayScanResult(element), 1000);
+                }, holdDuration);
+            }
         }
 
-        // Clear timeout when hold is released
         function clearHoldDetection() {
             clearTimeout(holdTimeout);
         }
 
         function displayScanResult(element) {
             const scanResult = element.dataset.scanResult;
-            if (scanResult === "success") {
-                displaySuccessResult();
-            }
-            else if (scanResult === "error") {
-                displayErrorResult();
-            }
+            scanResult === "success" ? displaySuccessResult() : displayErrorResult();
         }
 
         function displayDefaultText() {
-            text.innerHTML = `Validare card`;
+            canScan = true;
+            text.textContent = "Validare card";
             textContainer.className = "blue-background";
         }
 
-        function displayScanningResult() {
+        function displayScanning() {
+            canScan = false;
+            clearTimeout(displayDefaultTextTimeout);
             soundEffects.scan.play();
-            text.innerHTML = `Se validează cardul...`;
+            text.textContent = "Se validează cardul...";
             textContainer.className = "blue-background";
-            setTimeout(() => {
-                displayDefaultText();
-            }, 3000);
         }
 
         function displaySuccessResult() {
+            clearTimeout(displayDefaultTextTimeout);
             soundEffects.success.play();
-            text.innerHTML = `VALIDAT`;
+            text.textContent = "VALIDAT";
             textContainer.className = "green-background";
-            setTimeout(() => {
-                displayDefaultText();
-            }, 3000);
+            displayDefaultTextTimeout = setTimeout(displayDefaultText, 2000);
         }
 
         function displayErrorResult() {
+            clearTimeout(displayDefaultTextTimeout);
             soundEffects.error.play();
-            text.innerHTML = `NEVALIDAT`;
+            text.textContent = "NEVALIDAT";
             textContainer.className = "red-background";
+            displayDefaultTextTimeout = setTimeout(displayDefaultText, 2000);
         }
 
-        // Attach event listeners
-        overlayElements.forEach(function (element) {
-            element.addEventListener("mousedown", (e) => startHoldDetection(element));
-            element.addEventListener("mouseup", clearHoldDetection);
-            element.addEventListener("mouseleave", clearHoldDetection); // Clear if the mouse leaves the element
-
-            element.addEventListener("touchstart", (e) => startHoldDetection(element));
-            element.addEventListener("touchend", clearHoldDetection);
-            element.addEventListener("touchcancel", clearHoldDetection); // Clear if the touch is canceled
+        overlayElements.forEach(element => {
+            ["mousedown", "touchstart"].forEach(event => element.addEventListener(event, () => startHoldDetection(element)));
+            ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(event => element.addEventListener(event, clearHoldDetection));
         });
 
-        // Function to format and display the date and time
         function updateDateTime() {
             const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            const year = String(now.getFullYear()).slice(-2); // Get last two digits of the year
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            // Format as dd.mm.yy/hh:mm:ss
-            const formattedDateTime = `${day}.${month}.${year}/${hours}:${minutes}:${seconds}`;
-
-            // Set the formatted date and time to the div
+            const formattedDateTime = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getFullYear()).slice(-2)}/${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
             document.getElementById("dateTimeDisplay").textContent = formattedDateTime;
         }
 
-        // Update the date and time immediately and then every second
         updateDateTime();
         setInterval(updateDateTime, 1000);
-
     </script>
 
 </body>

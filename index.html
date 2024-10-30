@@ -6,8 +6,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" rel="stylesheet">
     <link rel="manifest" href="manifest.json" />
+    <link href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js" integrity="sha512-xi/RZRIF/S0hJ+yJJYuZ5yk6/8pCiRlEXZzoguSMl+vk2i3m6UjUO/WcZ11blRL/O+rnj94JRGwt/CHbc9+6EA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             touch-action: none;
@@ -148,12 +149,10 @@
     </section>
 
     <script>
-        alert("Happy Halloween!");
-
         const soundEffects = {
-            scan: new Audio('sounds/scan-1.mp3'),
-            success: new Audio('sounds/success-1.mp3'),
-            error: new Audio('sounds/error-1.mp3'),
+            scan: new Howl({ src: ['sounds/scan-1.mp3'] }),
+            success: new Howl({ src: ['sounds/success-1.mp3'] }),
+            error: new Howl({ src: ['sounds/error-1.mp3'] }),
         };
 
         const holdDuration = 500;
